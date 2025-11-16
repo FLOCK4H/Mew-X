@@ -10,7 +10,7 @@ High-performance trading bot powered by analytics.
 - Preferably Linux distro
 - [PostgreSQL](https://www.postgresql.org/)
 - Faith.
-- & an RPC provider, current fastest: https://apewise.org
+- & an RPC provider
 
 ## Features
 
