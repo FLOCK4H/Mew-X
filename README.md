@@ -59,7 +59,7 @@ Set path to your database in the `.env` file:
 DB_URL = "postgres://<user>:<password>@<host>:<port>" # need a valid postgre path 
 
 # example
-# DB_URL = "postgres://<user>:<password>@<host>:<port>" # need a valid postgre path 
+# DB_URL = "postgres://postgres@127.0.0.1:5432" # need a valid postgre path 
 ```
 
 Tables will be created on launch.
