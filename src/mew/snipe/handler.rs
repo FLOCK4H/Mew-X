@@ -400,7 +400,7 @@ impl MewSnipe {
             let token_stage_activity_ms = { if (snapshot.buys < 50 && profit < 10.0) || (snapshot.buys < 20) {max_na_on_start_ms} else {max_no_activity_ms} };
             let elapsed = last_update.elapsed().as_millis();
             if elapsed > token_stage_activity_ms as u128 {
-                log!(cc::LIGHT_YELLOW, "Mint: {:?} | Last Update: {:?} | Last profit recorded: {:.6}%", snapshot.mint, elapsed, last_profit);
+                log!(cc::LIGHT_YELLOW, "Selling Mint because of inactivity (MAX_NA_ON_START_MS: {:?}ms, MAX_NO_ACTIVITY_MS: {:?}ms) | Mint: {:?} | Last Update: {:?} | Last profit recorded: {:.6}%", max_na_on_start_ms, max_no_activity_ms, snapshot.mint, elapsed, last_profit);
                 should_sell = true;
             }
 
@@ -531,7 +531,12 @@ impl MewSnipe {
             let temporal_clients = &TemporalSender::multiple_new(&TEMPORAL_HTTP_ENDPOINTS, tx_settings.temporal_key);
             let blox_clients = Bloxroute::multiple_new(&BLOX_ENDPOINTS, tx_settings.blox_key);
             let tip_lamports = tx_settings.tip_lamports;
-            let nonce_account = Some(Pubkey::from_str(&get_nonce_account().unwrap()).unwrap());
+            
+            let nonce_account = if get_nonce_account().is_some() && get_nonce_account().unwrap().len() > 0 {
+                Some(Pubkey::from_str(&get_nonce_account().unwrap()).unwrap())
+            } else {
+                None
+            };
 
             tx = self.sol_hook.spray_with_all(
                 ixs, 
@@ -747,7 +752,7 @@ impl MewSnipe {
             let token_stage_activity_ms = { if (snapshot.buys < 50 && profit < 10.0) || (snapshot.buys < 20) {max_na_on_start_ms} else {max_no_activity_ms} };
             let elapsed = last_update.elapsed().as_millis();
             if elapsed > token_stage_activity_ms as u128 {
-                log!(cc::LIGHT_YELLOW, "Mint: {:?} | Last Update: {:?} | Last profit recorded: {:.6}%", snapshot.mint, elapsed, last_profit);
+                log!(cc::LIGHT_YELLOW, "Selling Mint because of inactivity (MAX_NA_ON_START_MS: {:?}ms, MAX_NO_ACTIVITY_MS: {:?}ms) | Mint: {:?} | Last Update: {:?} | Last profit recorded: {:.6}%", max_na_on_start_ms, max_no_activity_ms, snapshot.mint, elapsed, last_profit);
                 should_sell = true;
             }
 

@@ -1,5 +1,5 @@
 use {
-    mew::{log, mew::{config::{self, get_use_grpc, get_db_url}, deagle::deagle::{Deagle, DeagleConfig, Source}, snipe::handler::MewSnipe, sol_hook::{goldmine::Goldmine, pump_fun::PumpFun, pump_swap::PumpSwap, sol::SolHook, vacation::Vacation}, writing::{cc, Colors}}, warn}, solana_keypair::Keypair, std::{io::{self, StdoutLock}, sync::Arc}
+    mew::{log, mew::{config::{self, get_use_grpc, get_db_url, get_use_regions}, deagle::deagle::{Deagle, DeagleConfig, Source}, snipe::handler::MewSnipe, sol_hook::{goldmine::Goldmine, pump_fun::PumpFun, pump_swap::PumpSwap, sol::SolHook, vacation::Vacation}, writing::{cc, Colors}}, warn}, solana_keypair::Keypair, std::{io::{self, StdoutLock}, sync::Arc}
 };
 
 pub const VERSION: &str = "0.1.0";
@@ -34,9 +34,12 @@ async fn init_dbs(sol: &SolHook, colors: &mut Colors<'static>, pump_fun: &PumpFu
         let vacs = Vacation::new(sol.clone());
         let db_url = get_db_url();
         let vacs = vacs.initialize((db_url.clone() + "/vacation").as_str()).await;
-        vacs.fill(Some(500)).await.unwrap();
-        colors.cprint("Vacation database filled 🌴", cc::LIGHT_MAGENTA);
-    
+        if get_use_regions() {
+            vacs.fill(Some(500)).await.unwrap();
+            colors.cprint("Vacation database filled 🌴", cc::LIGHT_MAGENTA);
+        } else {
+            colors.cprint("Regions are disabled, skipping vacation database fill 🌴", cc::LIGHT_MAGENTA);
+        }
         // `goldmine` DB is used to store token data and duplicates.
         let goldmine = Goldmine::new(sol.clone());
         let goldmine = goldmine.initialize((db_url.clone() + "/goldmine").as_str()).await;

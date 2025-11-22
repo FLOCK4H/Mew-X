@@ -1170,15 +1170,23 @@ impl SolHook {
         nonce_account: Option<Pubkey>,
     ) -> anyhow::Result<Signature> {
         let start = std::time::Instant::now();
-    
+
         let (nonce_hash, _) = match nonce_account {
             Some(nonce_account) => self.get_nonce_data(&nonce_account).await?,
-            None => (self.rpc_client.get_latest_blockhash_with_commitment(CommitmentConfig::processed()).await?.0, Pubkey::default()),
+            None => (
+                self.rpc_client
+                    .get_latest_blockhash_with_commitment(CommitmentConfig::processed())
+                    .await?
+                    .0,
+                Pubkey::default(),
+            ),
         };
-        ixs.insert(0, system_instruction::advance_nonce_account(
-            &nonce_account.unwrap(),
-            &payer.pubkey(),
-        ));
+        if nonce_account.is_some() {
+            ixs.insert(
+                0,
+                system_instruction::advance_nonce_account(&nonce_account.unwrap(), &payer.pubkey()),
+            );
+        }
 
         let blockhash = nonce_hash;
         let slot0 = match slot0 {
