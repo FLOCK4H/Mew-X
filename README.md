@@ -53,6 +53,30 @@ $ > CREATE DATABASE vacation;
 $ > CREATE DATABASE goldmine;
 ```
 
+**If you can't `psql -U your_postgre_user` you can follow the example below:**
+
+```
+$ sudo nano /etc/postgresql/16/main/pg_hba.conf
+
+# Modify like this, change peer to trust:
+
+local   all             postgres                                trust
+
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# "local" is for Unix domain socket connections only
+local   all             all                                     trust
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            trust
+# IPv6 local connections:
+host    all             all             ::1/128                 scram-sha-256
+# Allow replication connections from localhost, by a user with the
+# replication privilege.
+local   replication     all                                     trust
+host    replication     all             127.0.0.1/32            scram-sha-256
+host    replication     all             ::1/128                 scram-sha-256
+```
+
 Set path to your database in the `.env` file:
 
 ```
